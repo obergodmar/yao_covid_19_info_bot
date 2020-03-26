@@ -78,7 +78,7 @@ Covid19InfoBot.onText(/\/info\s*("*[\w\s]*"*)\s*("*[\w\s]*"*)/i, (msg, match) =>
 			return;
 		}
 
-		if (covid19Stats.find(({country}) => country.toLowerCase() !== countryName.toLowerCase())) {
+		if (!covid19Stats.find(({country}) => country.toLowerCase() === countryName.toLowerCase())) {
 			errorNoCountry(msg.chat.id, Covid19InfoBot, countryName);
 			return;
 		}

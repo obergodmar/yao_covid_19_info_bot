@@ -80,12 +80,12 @@ export const showInfoByCountry = ({
 }) => {
 	const countryStats = covid19Stats.filter(({country}) =>
 		country.toLowerCase() === countryName.toLowerCase());
-	const countryStatsByProvince = countryStats.find(({province}) =>
+
+	const countryStatsByProvince = countryStats.filter(({province}) =>
 		province.toLowerCase() === provinceName.toLowerCase());
 
 	if (countryStats && countryStats.length === 1) {
 		const [{country, lastUpdate, province, confirmed, deaths, recovered}] = countryStats;
-
 		Covid19InfoBot
 			.sendMessage(
 				id,
@@ -97,38 +97,24 @@ export const showInfoByCountry = ({
 		return;
 	}
 
-	if (countryStatsByProvince) {
-		if (countryStatsByProvince.length) {
-			let countryStatsByProvinceInfo = {
-				country: countryName,
-				province: provinceName,
-				lastUpdate: countryStatsByProvince[0].lastUpdate,
-				confirmed: 0,
-				deaths: 0,
-				recovered: 0
-			};
+	if (countryStatsByProvince && countryStatsByProvince.length) {
+		let countryStatsByProvinceInfo = {
+			country: countryStatsByProvince[0].country,
+			province: countryStatsByProvince[0].province,
+			lastUpdate: countryStatsByProvince[0].lastUpdate,
+			confirmed: 0,
+			deaths: 0,
+			recovered: 0
+		};
 
-			countryStatsByProvinceInfo = countryStatsByProvince.reduce((stats, info) => ({
-				...stats,
-				confirmed: stats.confirmed + info.confirmed,
-				deaths: stats.deaths + info.deaths,
-				recovered: stats.recovered + info.recovered
-			}), countryStatsByProvinceInfo);
+		countryStatsByProvinceInfo = countryStatsByProvince.reduce((stats, info) => ({
+			...stats,
+			confirmed: stats.confirmed + info.confirmed,
+			deaths: stats.deaths + info.deaths,
+			recovered: stats.recovered + info.recovered
+		}), countryStatsByProvinceInfo);
 
-			const {country, lastUpdate, province, confirmed, deaths, recovered} = countryStatsByProvinceInfo;
-			Covid19InfoBot
-				.sendMessage(
-					id,
-					printInfo(lastUpdate, country, province, confirmed, deaths, recovered),
-					messageOptions
-				)
-				.then(() => console.log('NORMAL'))
-				.catch(error => console.log(`The error occurred: ${error}`));
-			return;
-		}
-
-		const {country, lastUpdate, province, confirmed, deaths, recovered} = countryStatsByProvince;
-
+		const {country, lastUpdate, province, confirmed, deaths, recovered} = countryStatsByProvinceInfo;
 		Covid19InfoBot
 			.sendMessage(
 				id,
@@ -144,7 +130,7 @@ export const showInfoByCountry = ({
 
 	const provinceButtons = {
 		reply_markup: JSON.stringify({
-			inline_keyboard: splitChunks(provinces, 'province', countryName),
+			inline_keyboard: splitChunks(provinces, 'province', countryStats[0].country),
 		})
 	};
 
