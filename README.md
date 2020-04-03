@@ -20,6 +20,7 @@ Telegram Bot which can inform you about COVID-19 statistics. It uses [this REST 
 REST API for COVID-19 Stats - [https://covid19-api.weedmark.systems/](https://covid19-api.weedmark.systems/)
 
 ### Todo
+- [x] Add "all info"
 - [ ] Add an ability to display info by city
 
 ### Changelog

@@ -3,6 +3,7 @@ import {
 	API_ERROR,
 	COMMAND_countrylist,
 	COMMAND_info,
+	COMMAND_input,
 	messageOptions,
 	SOCKS_HOST,
 	SOCKS_PORT,
@@ -14,7 +15,8 @@ import {
 	showInfoByCountry,
 	splitChunks,
 	chunkArray,
-	sendMessages
+	sendMessages,
+	showStatus
 } from './utils';
 import TelegramBot from 'node-telegram-bot-api';
 
@@ -32,26 +34,35 @@ const Covid19InfoBot = new TelegramBot(TOKEN, {
 });
 
 Covid19InfoBot.onText(/\/start/i, (msg) => {
+	const {id} = msg.chat;
+	const waitMessage = Covid19InfoBot.sendMessage(id, COMMAND_input, messageOptions);
+
 	covid19Info().then(({data}) => {
 		const {covid19Stats} = data;
 		if (apiCheck(covid19Stats)) {
 			Covid19InfoBot
-				.sendMessage(msg.chat.id, API_ERROR, messageOptions)
+				.sendMessage(id, API_ERROR, messageOptions)
 				.then(() => console.log('API_ERROR'))
 				.catch(error => console.log(`The error occurred: ${error}`));
 			return;
 		}
 
 		const countries = infoNumber(covid19Stats, 'country');
-
-		Covid19InfoBot
-			.sendMessage(
-				msg.chat.id,
-				`There are information about *${Object.keys(countries).length}* countries available.\n\n${COMMAND_countrylist}.\n\n${COMMAND_info}`,
-				messageOptions
-			)
-			.then(() => console.log('NORMAL'))
-			.catch(error => console.log(`The error occurred: ${error}`));
+		waitMessage.then(({message_id}) => {
+			Covid19InfoBot.deleteMessage(
+				id,
+				message_id
+			).then(() => {
+				Covid19InfoBot
+					.sendMessage(
+						id,
+						`There are information about *${Object.keys(countries).length}* countries available.\n\n${COMMAND_countrylist}.\n\n${COMMAND_info}`,
+						messageOptions
+					)
+					.then(() => console.log('NORMAL'))
+					.catch(error => console.log(`The error occurred: ${error}`));
+			}).catch(error => console.log(`The error occurred: ${error}`));
+		}).catch(error => console.log(`The error occurred: ${error}`));
 	});
 });
 
@@ -96,12 +107,15 @@ Covid19InfoBot.onText(/\/info\s*("*[\w\s]*"*)\s*("*[\w\s]*"*)/i, (msg, match) =>
 });
 
 Covid19InfoBot.onText(/\/countrylist/i, (msg) => {
+	const {id} = msg.chat;
+	const waitMessage = Covid19InfoBot.sendMessage(id, COMMAND_input, messageOptions);
+
 	covid19Info().then(({data}) => {
 		const {covid19Stats} = data;
 
 		if (apiCheck(covid19Stats)) {
 			Covid19InfoBot
-				.sendMessage(msg.chat.id, API_ERROR, messageOptions)
+				.sendMessage(id, API_ERROR, messageOptions)
 				.then(() => console.log('API_ERROR'))
 				.catch(error => console.log(`The error occurred: ${error}`));
 			return;
@@ -124,9 +138,16 @@ Covid19InfoBot.onText(/\/countrylist/i, (msg) => {
 
 		messages = [{text: COMMAND_info, options: messageOptions}, ...messages];
 
-		sendMessages(Covid19InfoBot, msg.chat.id, messages)
-			.then(() => console.log('ALL_NORMAL'))
-			.catch(error => console.log(`The error occurred: ${error}`));
+		waitMessage.then(({message_id}) => {
+			Covid19InfoBot.deleteMessage(
+				id,
+				message_id
+			).then(() => {
+				sendMessages(Covid19InfoBot, id, messages)
+					.then(() => console.log('ALL_NORMAL'))
+					.catch(error => console.log(`The error occurred: ${error}`));
+			}).catch(error => console.log(`The error occurred: ${error}`));
+		}).catch(error => console.log(`The error occurred: ${error}`));
 	});
 });
 
@@ -174,3 +195,20 @@ Covid19InfoBot.onText(/.*/, (msg, match) => {
 	console.log(logMessage);
 });
 
+Covid19InfoBot.onText(/\/status/i, (msg) => {
+	const waitMessage = Covid19InfoBot.sendMessage(msg.chat.id, COMMAND_input, messageOptions);
+
+	covid19Info().then(({data}) => {
+		const {covid19Stats} = data;
+
+		if (apiCheck(covid19Stats)) {
+			Covid19InfoBot
+				.sendMessage(msg.chat.id, API_ERROR, messageOptions)
+				.then(() => console.log('API_ERROR'))
+				.catch(error => console.log(`The error occurred: ${error}`));
+			return;
+		}
+
+		showStatus(msg.chat.id, Covid19InfoBot, covid19Stats, waitMessage);
+	});
+});
