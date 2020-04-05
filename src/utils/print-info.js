@@ -1,11 +1,11 @@
-export const printInfo = (
-    lastUpdate,
-    country,
-    province,
-    confirmed,
-    deaths,
-    recovered
-) => {
+export const printInfo = ({
+      lastUpdate,
+      country,
+      province,
+      confirmed,
+      deaths,
+      recovered
+}) => {
     const timeOptions = {
         hour: 'numeric',
         minute: 'numeric',

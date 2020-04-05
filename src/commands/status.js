@@ -1,6 +1,6 @@
-import {API_ERROR, INFO_INPUT, messageOptions} from '../constants';
+import {INFO_INPUT, messageOptions} from '../constants';
 import {apiCheck, covid19Info} from '../api';
-import {showStatus} from '../utils';
+import {apiCheckError, showStatus} from '../utils';
 
 export const statusCommand = (id, Covid19InfoBot) => {
     const waitMessage = Covid19InfoBot.sendMessage(id, INFO_INPUT, messageOptions);
@@ -9,10 +9,7 @@ export const statusCommand = (id, Covid19InfoBot) => {
         const {covid19Stats} = data;
 
         if (apiCheck(covid19Stats)) {
-            Covid19InfoBot
-                .sendMessage(id, API_ERROR, messageOptions)
-                .then(() => console.log('API_ERROR'))
-                .catch(error => console.log(`The error occurred: ${error}`));
+            apiCheckError(id, Covid19InfoBot, waitMessage);
             return;
         }
 

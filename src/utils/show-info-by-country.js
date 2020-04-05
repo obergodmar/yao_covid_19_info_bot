@@ -1,60 +1,41 @@
-import {messageOptions} from '../constants';
-import {printInfo} from './print-info';
 import {infoNumber} from './info-number';
 import {splitChunks} from './split-chunks';
+import {sendCountryStats} from './send-country-stats';
+import {deleteMessage} from './delete-message';
+import {accumulateInfo} from './accumulate-info';
+import {printInfo} from './print-info';
+import {messageOptions} from '../constants';
 
 export const showInfoByCountry = ({
       id,
       Covid19InfoBot,
       covid19Stats,
       countryName,
-      provinceName
+      provinceName,
+      waitMessage
 }) => {
     const countryStats = covid19Stats.filter(({country}) =>
         country.toLowerCase() === countryName.toLowerCase());
+
+    const countryParams = accumulateInfo(countryStats[0].country, '', covid19Stats);
 
     const countryStatsByProvince = countryStats.filter(({province}) =>
         province.toLowerCase() === provinceName.toLowerCase());
 
     if (countryStats && countryStats.length === 1) {
-        const [{country, lastUpdate, province, confirmed, deaths, recovered}] = countryStats;
-        Covid19InfoBot
-            .sendMessage(
-                id,
-                printInfo(lastUpdate, country, province, confirmed, deaths, recovered),
-                messageOptions
-            )
-            .then(() => console.log('NORMAL'))
-            .catch(error => console.log(`The error occurred: ${error}`));
+        const [params] = countryStats;
+        sendCountryStats(id, Covid19InfoBot, waitMessage, params);
         return;
     }
 
     if (countryStatsByProvince && countryStatsByProvince.length) {
-        let countryStatsByProvinceInfo = {
-            country: countryStatsByProvince[0].country,
-            province: countryStatsByProvince[0].province,
-            lastUpdate: countryStatsByProvince[0].lastUpdate,
-            confirmed: 0,
-            deaths: 0,
-            recovered: 0
-        };
+        const params = accumulateInfo(
+            countryStatsByProvince[0].country,
+            countryStatsByProvince[0].province,
+            countryStatsByProvince
+        );
 
-        countryStatsByProvinceInfo = countryStatsByProvince.reduce((stats, info) => ({
-            ...stats,
-            confirmed: stats.confirmed + info.confirmed,
-            deaths: stats.deaths + info.deaths,
-            recovered: stats.recovered + info.recovered
-        }), countryStatsByProvinceInfo);
-
-        const {country, lastUpdate, province, confirmed, deaths, recovered} = countryStatsByProvinceInfo;
-        Covid19InfoBot
-            .sendMessage(
-                id,
-                printInfo(lastUpdate, country, province, confirmed, deaths, recovered),
-                messageOptions
-            )
-            .then(() => console.log('NORMAL'))
-            .catch(error => console.log(`The error occurred: ${error}`));
+        sendCountryStats(id, Covid19InfoBot, waitMessage, params);
         return;
     }
 
@@ -66,12 +47,23 @@ export const showInfoByCountry = ({
         })
     };
 
-    Covid19InfoBot
-        .sendMessage(
-            id,
-            `${countryName} has ${Object.keys(provinces).length} provinces. Which province do you need?`,
-            provinceButtons
-        )
-        .then(() => console.log('NORMAL'))
-        .catch(error => console.log(`The error occurred: ${error}`));
+    deleteMessage(id, Covid19InfoBot, waitMessage)
+        .then(() => {
+            Covid19InfoBot
+                .sendMessage(
+                    id,
+                    `${countryName} has ${Object.keys(provinces).length} provinces. Which province do you need?`,
+                    provinceButtons
+                )
+                .then(() => {
+                    Covid19InfoBot
+                        .sendMessage(
+                            id,
+                            printInfo(countryParams),
+                            messageOptions
+                        ).then(() => console.log('NORMAL'))
+                        .catch(error => console.log(`The error occurred: ${error}`));
+                }).catch(error => console.log(`The error occurred: ${error}`));
+        }).catch(error => console.log(`The error occurred: ${error}`));
+
 };

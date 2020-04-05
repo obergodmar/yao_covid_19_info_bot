@@ -7,3 +7,7 @@ export {sendMessages} from './send-messages';
 export {showInfoByCountry} from './show-info-by-country';
 export {splitChunks} from './split-chunks';
 export {showStatus} from './show-status';
+export {apiCheckError} from './api-check-error';
+export {deleteMessage} from './delete-message';
+export {sendCountryStats} from './send-country-stats';
+export {accumulateInfo} from './accumulate-info';

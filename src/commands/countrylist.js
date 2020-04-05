@@ -1,6 +1,6 @@
-import {API_ERROR, INFO, INFO_INPUT, messageOptions} from '../constants';
+import {INFO, INFO_INPUT, messageOptions} from '../constants';
 import {apiCheck, covid19Info} from '../api';
-import {chunkArray, infoNumber, sendMessages, splitChunks} from '../utils';
+import {apiCheckError, chunkArray, deleteMessage, infoNumber, sendMessages, splitChunks} from '../utils';
 
 export const countryListCommand = (id, Covid19InfoBot) => {
     const waitMessage = Covid19InfoBot.sendMessage(id, INFO_INPUT, messageOptions);
@@ -9,10 +9,7 @@ export const countryListCommand = (id, Covid19InfoBot) => {
         const {covid19Stats} = data;
 
         if (apiCheck(covid19Stats)) {
-            Covid19InfoBot
-                .sendMessage(id, API_ERROR, messageOptions)
-                .then(() => console.log('API_ERROR'))
-                .catch(error => console.log(`The error occurred: ${error}`));
+            apiCheckError(id, Covid19InfoBot, waitMessage);
             return;
         }
 
@@ -33,15 +30,10 @@ export const countryListCommand = (id, Covid19InfoBot) => {
 
         messages = [{text: INFO, options: messageOptions}, ...messages];
 
-        waitMessage.then(({message_id}) => {
-            Covid19InfoBot.deleteMessage(
-                id,
-                message_id
-            ).then(() => {
-                sendMessages(Covid19InfoBot, id, messages)
-                    .then(() => console.log('ALL_NORMAL'))
-                    .catch(error => console.log(`The error occurred: ${error}`));
-            }).catch(error => console.log(`The error occurred: ${error}`));
+        deleteMessage(id, Covid19InfoBot, waitMessage).then(() => {
+            sendMessages(Covid19InfoBot, id, messages)
+                .then(() => console.log('ALL_NORMAL'))
+                .catch(error => console.log(`The error occurred: ${error}`));
         }).catch(error => console.log(`The error occurred: ${error}`));
     });
 };

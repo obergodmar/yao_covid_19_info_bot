@@ -1,8 +1,9 @@
 import {apiCheck, covid19Info} from '../api';
-import {API_ERROR, messageOptions} from '../constants';
-import {errorNoCountry, showInfoByCountry} from '../utils';
+import {apiCheckError, errorNoCountry, showInfoByCountry} from '../utils';
+import {INFO_INPUT, messageOptions} from '../constants';
 
 export const buttonCommand = ({id, first_name, username}, {data}, Covid19InfoBot) => {
+    const waitMessage = Covid19InfoBot.sendMessage(id, INFO_INPUT, messageOptions);
     const logMessage = `${first_name} (${username}): BUTTON - ${data}`;
     console.log(logMessage);
 
@@ -12,15 +13,12 @@ export const buttonCommand = ({id, first_name, username}, {data}, Covid19InfoBot
         const {covid19Stats} = data;
 
         if (apiCheck(covid19Stats)) {
-            Covid19InfoBot
-                .sendMessage(id, API_ERROR, messageOptions)
-                .then(() => console.log('API_ERROR'))
-                .catch(error => console.log(`The error occurred: ${error}`));
+            apiCheckError(id, Covid19InfoBot, waitMessage);
             return;
         }
 
         if (covid19Stats.find(({country}) => country !== countryName)) {
-            errorNoCountry(id, Covid19InfoBot, countryName);
+            errorNoCountry(id, Covid19InfoBot, countryName, waitMessage);
             return;
         }
 
@@ -29,7 +27,8 @@ export const buttonCommand = ({id, first_name, username}, {data}, Covid19InfoBot
             Covid19InfoBot,
             covid19Stats,
             countryName,
-            provinceName
+            provinceName,
+            waitMessage
         };
 
         showInfoByCountry(params);
