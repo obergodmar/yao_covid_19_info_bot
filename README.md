@@ -21,6 +21,7 @@ REST API for COVID-19 Stats - [https://covid19-api.weedmark.systems/](https://co
 
 ### Todo
 - [x] Add "all info"
+- [] Add "country status"
 - [ ] Add an ability to display info by city
 
 ### Changelog
