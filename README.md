@@ -27,5 +27,10 @@ REST API for COVID-19 Stats - [https://covid19-api.weedmark.systems/](https://co
 
 ### Changelog
 
+#### [1.1.0] - 2020-04-05
+- Add "all info"
+- Add "country status"
+- Refactor the code
+
 #### [1.0.0] - 2020-03-26
 - Initial commit
