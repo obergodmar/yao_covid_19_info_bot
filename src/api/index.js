@@ -8,7 +8,7 @@ const API_OPTIONS = {
     headers: {
 		"content-type": "application/octet-stream",
 		"x-rapidapi-host": API,
-		"x-rapidapi-key": API_KEY
+		"x-rapidapi-key": process.env.API_KEY
     }
 };
 

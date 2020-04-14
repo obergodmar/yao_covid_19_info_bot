@@ -1,10 +1,5 @@
 import TelegramBot from 'node-telegram-bot-api';
-const Agent = require('socks5-https-client/lib/Agent');
-import {
-	SOCKS_HOST,
-	SOCKS_PORT,
-	TOKEN
-} from './constants';
+import {TOKEN} from './constants';
 import {
 	logCommand
 } from './utils';
@@ -17,17 +12,15 @@ import {
 	statusCommand
 } from './commands';
 
-process.env.NTBA_FIX_319 = 1;
+require('http')
+	.createServer()
+	.listen(process.env.PORT || 5000)
+	.on('request', (req, res) => {
+		res.end('')
+	});
 
-const Covid19InfoBot = new TelegramBot(TOKEN, {
-    polling: true,
-    request: {
-		agentClass: Agent,
-		agentOptions: {
-			socksHost: SOCKS_HOST,
-			socksPort: SOCKS_PORT
-		}
-	}
+const Covid19InfoBot = new TelegramBot(process.env.TOKEN, {
+    polling: true
 });
 
 Covid19InfoBot
@@ -63,7 +56,8 @@ Covid19InfoBot
 Covid19InfoBot
 	.onText(
 		/.*/,
-		(msg, match) => logCommand(msg.chat, match));
+		(msg, match) => logCommand(msg.chat, match)
+	);
 
 Covid19InfoBot
 	.onText(
