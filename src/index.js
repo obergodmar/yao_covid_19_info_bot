@@ -1,5 +1,4 @@
 import TelegramBot from 'node-telegram-bot-api';
-import {TOKEN} from './constants';
 import {
 	logCommand
 } from './utils';

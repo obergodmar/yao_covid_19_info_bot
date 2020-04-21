@@ -24,7 +24,7 @@ export const infoCommand = (id, Covid19InfoBot, match) => {
             return;
         }
 
-        if (!covid19Stats.find(({country}) => country.toLowerCase() === countryName.toLowerCase())) {
+        if (!covid19Stats.find(({country}) => country && country.toLowerCase() === countryName.toLowerCase())) {
             errorNoCountry(id, Covid19InfoBot, countryName, waitMessage);
             return;
         }

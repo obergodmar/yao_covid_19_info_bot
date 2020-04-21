@@ -15,12 +15,12 @@ export const showInfoByCountry = ({
       waitMessage
 }) => {
     const countryStats = covid19Stats.filter(({country}) =>
-        country.toLowerCase() === countryName.toLowerCase());
+        country && country.toLowerCase() === countryName.toLowerCase());
 
     const countryParams = accumulateInfo(countryStats[0].country, '', covid19Stats);
 
     const countryStatsByProvince = countryStats.filter(({province}) =>
-        province.toLowerCase() === provinceName.toLowerCase());
+        province && province.toLowerCase() === provinceName.toLowerCase());
 
     if (countryStats && countryStats.length === 1) {
         const [params] = countryStats;

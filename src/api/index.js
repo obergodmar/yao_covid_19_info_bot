@@ -1,6 +1,5 @@
 import axios from 'axios';
 const API = 'covid-19-coronavirus-statistics.p.rapidapi.com';
-const API_KEY = '';
 
 const API_OPTIONS = {
 	method: "GET",

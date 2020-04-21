@@ -2,7 +2,6 @@ export const messageOptions = {
 	parse_mode: 'Markdown'
 };
 
-export const TOKEN = '';
 export const INFO_INPUT = 'Please wait. Information is processing...';
 export const INFO_COUNTRY_LIST = 'Would you like to see country list? Type /countrylist';
 export const INFO_STATUS = 'You can see information about all countries by typing /status command';
