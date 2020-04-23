@@ -17,6 +17,11 @@ export const infoCommand = (id, Covid19InfoBot, match) => {
     const provinceName = match[2].replace(/"/g, '') || '';
 
     covid19Info(countryName).then(({data}) => {
+        if (!data) {
+            apiCheckError(id, Covid19InfoBot, waitMessage);
+            return;
+        }
+
         const {covid19Stats} = data;
 
         if (apiCheck(covid19Stats)) {
