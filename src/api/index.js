@@ -21,7 +21,6 @@ export const covid19Info = (countryName = '') => axios({
 	.catch(error => `The error occurred: ${error}`);
 
 export const apiCheck = (covid19Stats) => (
-	covid19Stats &&
     covid19Stats.find(stat => !(
     		stat.hasOwnProperty('country') &&
     		stat.hasOwnProperty('city') &&

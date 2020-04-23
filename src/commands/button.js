@@ -10,6 +10,11 @@ export const buttonCommand = ({id, first_name, username}, {data}, Covid19InfoBot
     const [countryName, provinceName] = data.split('_');
 
     covid19Info(countryName).then(({data}) => {
+        if (!data) {
+            apiCheckError(id, Covid19InfoBot, waitMessage);
+            return;
+        }
+
         const {covid19Stats} = data;
 
         if (apiCheck(covid19Stats)) {
